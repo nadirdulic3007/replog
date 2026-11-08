@@ -1,17 +1,23 @@
-import { Text, View, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Text } from "react-native";
+
+import { WorkoutCard } from "@/components/WorkoutCard";
+import { workouts } from "@/data/workouts";
 
 export default function Index() {
   return (
-    <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.content}>
+      <Text>{workouts.length} workouts</Text>
+
+      {workouts.map((workout) => (
+        <WorkoutCard key={workout.id} workout={workout} />
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  content: {
+    padding: 16,
+    gap: 12,
   },
 });
