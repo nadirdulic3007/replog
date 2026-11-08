@@ -1,24 +1,55 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 
+import { FontSize, Radius, Spacing } from "@/constants/theme";
+import { useTheme } from "@/hooks/use-theme";
 import type { Workout } from "@/types";
 
 type Props = {
   workout: Workout;
+  style?: StyleProp<ViewStyle>;
 };
 
-export function WorkoutCard({ workout }: Props) {
+export function WorkoutCard({ workout, style }: Props) {
+  const theme = useTheme();
+
   return (
     <Pressable
       onPress={() => console.log("Open", workout.id)}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: theme.card, borderColor: theme.border },
+        pressed && styles.pressed,
+        style,
+      ]}
     >
       {workout.photo ? (
-        <Image source={workout.photo} style={styles.photo} />
+        <View style={styles.photoFrame}>
+          <Image source={workout.photo} style={styles.photo} />
+          <Text
+            style={[
+              styles.badge,
+              { backgroundColor: theme.primary, color: theme.onPrimary },
+            ]}
+          >
+            {workout.type}
+          </Text>
+        </View>
       ) : null}
       <View style={styles.body}>
-        <Text style={styles.title}>{workout.title}</Text>
-        <Text>
-          {workout.date} · {workout.durationMin} min · {workout.type}
+        <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
+          {workout.title}
+        </Text>
+        <Text style={[styles.details, { color: theme.muted }]}>
+          {workout.date} · {workout.durationMin} min ·{" "}
+          {workout.exercises.length} exercises
         </Text>
       </View>
     </Pressable>
@@ -27,24 +58,41 @@ export function WorkoutCard({ workout }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radius.md,
     overflow: "hidden",
   },
   pressed: {
     opacity: 0.7,
   },
+  photoFrame: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+  },
   photo: {
     width: "100%",
-    height: 160,
+    height: "100%",
+  },
+  badge: {
+    position: "absolute",
+    top: Spacing.sm,
+    right: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.pill,
+    overflow: "hidden",
+    fontSize: FontSize.small,
+    fontWeight: "600",
   },
   body: {
-    padding: 12,
-    gap: 4,
+    padding: Spacing.md,
+    gap: Spacing.xs,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: FontSize.title,
+    fontWeight: "700",
+  },
+  details: {
+    fontSize: FontSize.small,
   },
 });
