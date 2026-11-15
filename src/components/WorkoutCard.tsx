@@ -15,14 +15,20 @@ import type { Workout } from "@/types";
 type Props = {
   workout: Workout;
   style?: StyleProp<ViewStyle>;
+  onLongPress?: () => void;
 };
 
-export function WorkoutCard({ workout, style }: Props) {
+export function WorkoutCard({ workout, style, onLongPress }: Props) {
   const theme = useTheme();
 
   return (
     <Pressable
       onPress={() => console.log("Open", workout.id)}
+      onLongPress={onLongPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${workout.title}, ${workout.date}, ${workout.durationMin} minutes, ${workout.type}, ${workout.exercises.length} exercises`}
+      accessibilityHint="Long press to delete"
+      android_ripple={{ color: theme.border }}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: theme.card, borderColor: theme.border },

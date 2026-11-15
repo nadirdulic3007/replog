@@ -22,7 +22,7 @@ Open the app with Expo Go (SDK 58) by scanning the QR code, or press `w` for the
 
 - [x] First static screens from mock data (workout list with cards, workout details component)
 - [x] Consistent theme (light and dark) and responsive layout
-- [ ] Workout list with empty and loading states
+- [x] Workout list with empty and loading states (FlatList grid, error with retry, pull-to-refresh, filter and sort chips, long press to delete)
 - [ ] Workout details screen (`/workout/[id]`)
 - [ ] Tabs (Workouts, Profile) and an add/edit modal
 - [ ] Add, edit and delete a workout with form validation
