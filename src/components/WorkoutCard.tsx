@@ -11,23 +11,25 @@ import {
 import { FontSize, Radius, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import type { Workout } from "@/types";
+import { formatDate } from "@/utils/format";
 
 type Props = {
   workout: Workout;
   style?: StyleProp<ViewStyle>;
+  onPress?: () => void;
   onLongPress?: () => void;
 };
 
-export function WorkoutCard({ workout, style, onLongPress }: Props) {
+export function WorkoutCard({ workout, style, onPress, onLongPress }: Props) {
   const theme = useTheme();
 
   return (
     <Pressable
-      onPress={() => console.log("Open", workout.id)}
+      onPress={onPress}
       onLongPress={onLongPress}
       accessibilityRole="button"
-      accessibilityLabel={`${workout.title}, ${workout.date}, ${workout.durationMin} minutes, ${workout.type}, ${workout.exercises.length} exercises`}
-      accessibilityHint="Long press to delete"
+      accessibilityLabel={`${workout.title}, ${formatDate(workout.date)}, ${workout.durationMin} minutes, ${workout.type}, ${workout.exercises.length} exercises`}
+      accessibilityHint="Opens the workout. Long press to delete."
       android_ripple={{ color: theme.border }}
       style={({ pressed }) => [
         styles.card,
@@ -54,7 +56,7 @@ export function WorkoutCard({ workout, style, onLongPress }: Props) {
           {workout.title}
         </Text>
         <Text style={[styles.details, { color: theme.muted }]}>
-          {workout.date} · {workout.durationMin} min ·{" "}
+          {formatDate(workout.date)} · {workout.durationMin} min ·{" "}
           {workout.exercises.length} exercises
         </Text>
       </View>
