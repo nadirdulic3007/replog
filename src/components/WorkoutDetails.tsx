@@ -1,24 +1,40 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { FontSize, Spacing } from "@/constants/theme";
+import { FontSize, Radius, Spacing } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 import type { Workout } from "@/types";
+import { formatDate } from "@/utils/format";
 
 type Props = {
   workout: Workout;
+  onBack: () => void;
 };
 
-export function WorkoutDetails({ workout }: Props) {
+export function WorkoutDetails({ workout, onBack }: Props) {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
 
-  const rows = [
-    { label: "Date", value: workout.date },
-    { label: "Type", value: workout.type },
-    { label: "Duration", value: `${workout.durationMin} min` },
+  const stats = [
+    { value: `${workout.durationMin} min`, label: "duration" },
+    { value: workout.type, label: "type" },
+    { value: formatDate(workout.date), label: "date" },
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles.scroll}>
+    <ScrollView
+      contentContainerStyle={[
+        styles.scroll,
+        { paddingBottom: Spacing.lg + insets.bottom },
+      ]}
+    >
       <View style={styles.content}>
         {workout.photo ? (
           <View style={styles.photoFrame}>
@@ -30,23 +46,30 @@ export function WorkoutDetails({ workout }: Props) {
           {workout.title}
         </Text>
 
-        {rows.map((row) => (
-          <View
-            key={row.label}
-            style={[styles.row, { borderColor: theme.border }]}
-          >
-            <Text style={[styles.label, { color: theme.muted }]}>
-              {row.label}
-            </Text>
-            <Text style={[styles.value, { color: theme.text }]}>
-              {row.value}
-            </Text>
-          </View>
-        ))}
+        <View style={styles.stats}>
+          {stats.map((stat) => (
+            <View
+              key={stat.label}
+              style={[
+                styles.stat,
+                { backgroundColor: theme.card, borderColor: theme.border },
+              ]}
+            >
+              <Text style={[styles.statValue, { color: theme.primary }]}>
+                {stat.value}
+              </Text>
+              <Text style={[styles.statLabel, { color: theme.muted }]}>
+                {stat.label}
+              </Text>
+            </View>
+          ))}
+        </View>
 
         <Text style={[styles.heading, { color: theme.text }]}>Exercises</Text>
         {workout.exercises.length === 0 ? (
-          <Text style={{ color: theme.muted }}>No exercises logged.</Text>
+          <Text style={[styles.body, { color: theme.muted }]}>
+            No exercises logged.
+          </Text>
         ) : (
           workout.exercises.map((exercise) => (
             <View key={exercise.name} style={styles.exercise}>
@@ -58,7 +81,7 @@ export function WorkoutDetails({ workout }: Props) {
                   key={index}
                   style={[styles.row, { borderColor: theme.border }]}
                 >
-                  <Text style={[styles.label, { color: theme.muted }]}>
+                  <Text style={[styles.body, { color: theme.muted }]}>
                     Set {index + 1}
                   </Text>
                   <Text style={[styles.value, { color: theme.text }]}>
@@ -70,14 +93,29 @@ export function WorkoutDetails({ workout }: Props) {
           ))
         )}
 
-        {workout.notes ? (
-          <>
-            <Text style={[styles.heading, { color: theme.text }]}>Notes</Text>
-            <Text style={[styles.notes, { color: theme.text }]}>
-              {workout.notes}
-            </Text>
-          </>
-        ) : null}
+        <Text style={[styles.heading, { color: theme.text }]}>Notes</Text>
+        <Text
+          style={[
+            styles.body,
+            { color: workout.notes ? theme.text : theme.muted },
+          ]}
+        >
+          {workout.notes ?? "No notes for this workout."}
+        </Text>
+
+        <Pressable
+          onPress={onBack}
+          accessibilityRole="button"
+          style={({ pressed }) => [
+            styles.button,
+            { borderColor: theme.primary },
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={[styles.buttonText, { color: theme.primary }]}>
+            Back to the list
+          </Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -106,20 +144,25 @@ const styles = StyleSheet.create({
     fontSize: FontSize.hero,
     fontWeight: "700",
   },
-  row: {
+  stats: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    gap: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    gap: Spacing.sm,
   },
-  label: {
-    fontSize: FontSize.body,
+  stat: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: Radius.md,
   },
-  value: {
-    flexShrink: 1,
+  statValue: {
     fontSize: FontSize.body,
-    textAlign: "right",
+    fontWeight: "700",
+    textAlign: "center",
+  },
+  statLabel: {
+    fontSize: FontSize.small,
   },
   heading: {
     fontSize: FontSize.title,
@@ -134,7 +177,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: Spacing.sm,
   },
-  notes: {
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  body: {
     fontSize: FontSize.body,
+  },
+  value: {
+    flexShrink: 1,
+    fontSize: FontSize.body,
+    textAlign: "right",
+  },
+  button: {
+    marginTop: Spacing.lg,
+    alignItems: "center",
+    paddingVertical: Spacing.sm,
+    borderWidth: 1,
+    borderRadius: Radius.pill,
+  },
+  buttonText: {
+    fontSize: FontSize.body,
+    fontWeight: "600",
+  },
+  pressed: {
+    opacity: 0.7,
   },
 });
