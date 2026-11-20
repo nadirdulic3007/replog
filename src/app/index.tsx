@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -35,6 +36,7 @@ function Separator() {
 }
 
 export default function Index() {
+  const router = useRouter();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -156,6 +158,7 @@ export default function Index() {
         <WorkoutCard
           workout={item}
           style={{ width: cardWidth }}
+          onPress={() => router.push(`/workout/${item.id}`)}
           onLongPress={() => confirmDelete(item)}
         />
       )}
